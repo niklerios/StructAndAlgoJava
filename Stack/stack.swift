@@ -16,13 +16,8 @@ struct StackX<T> {
         return item
     }
 
-    var isEmpty: Bool {
-        top == -1
-    }
-
-    var isFull: Bool {
-        top == maxSize - 1
-    }
+    var isEmpty: Bool { top == -1 }
+    var isFull: Bool { top == maxSize - 1 }
 
     init(maxSize: Int) {
         self.maxSize = maxSize
