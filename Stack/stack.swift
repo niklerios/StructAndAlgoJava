@@ -21,15 +21,9 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     private var currentItem: I {
         get throws {
-            guard !isEmpty else {
-                throw StackError.underflow
-            }
-            guard
-                (0..<limit).contains(pointer),
-                let item = store[pointer]
-            else {
-                throw StackError.corruptedState
-            }
+            guard !isEmpty else { throw StackError.underflow }
+            guard (0..<limit).contains(pointer), let item = store[pointer]
+            else { throw StackError.corruptedState }
 
             return item
         }
@@ -51,9 +45,7 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
     }
 
     mutating func push(_ item: I) throws {
-        guard !isFull else {
-            throw StackError.overflow
-        }
+        guard !isFull else { throw StackError.overflow }
 
         pointer += 1
         store[pointer] = item
@@ -76,18 +68,12 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 struct DynamicArrayStack<I>: StackProtocol {
     private var store = [I]()
     
-    var isEmpty: Bool {
-        store.isEmpty
-    }
+    var isEmpty: Bool { store.isEmpty }
     
     private var currentItem: I {
         get throws {
-            guard !isEmpty else {
-                throw StackError.underflow
-            }
-            guard let item = store.last else {
-                throw StackError.corruptedState
-            }
+            guard !isEmpty else { throw StackError.underflow }
+            guard let item = store.last else { throw StackError.corruptedState }
             
             return item
         }
@@ -98,10 +84,7 @@ struct DynamicArrayStack<I>: StackProtocol {
     }
     
     mutating func pop() throws -> I {
-        defer {
-            store.removeLast()
-        }
-
+        defer { store.removeLast() }
         return try currentItem
     }
     
