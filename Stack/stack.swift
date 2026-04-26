@@ -14,50 +14,45 @@ protocol LimitedStackProtocol: StackProtocol {
     var isFull: Bool { get }
 }
 
-struct LimitedArrayStack<T>: LimitedStackProtocol {
-    private let maxSize: Int
-    private var stackArray: [T?]
-    private var top = -1
+struct LimitedArrayStack<I>: LimitedStackProtocol {
+    private let limit: Int
+    private var store: [I?]
+    private var pointer = -1
 
-    private var topItem: T {
+    private var currentItem: I {
         get throws {
-            guard (0..<maxSize).contains(top), let item = stackArray[top]
+            guard (0..<limit).contains(pointer), let item = store[pointer]
             else { throw StackError.corruptedState }
             return item
         }
     }
 
-    var isEmpty: Bool { top == -1 }
-    var isFull: Bool { top == maxSize - 1 }
+    var isEmpty: Bool { pointer == -1 }
+    var isFull: Bool { pointer == limit - 1 }
 
-    init(maxSize: Int) {
-        precondition(maxSize > 0, "maxSize must be > 0")
-        self.maxSize = maxSize
-        stackArray = [T?](repeating: nil, count: maxSize)
+    init(limit: Int) {
+        precondition(limit > 0, "limit must be > 0")
+        self.limit = limit
+        store = [I?](repeating: nil, count: limit)
     }
 
-    mutating func push(_ item: T) throws {
+    mutating func push(_ item: I) throws {
         guard !isFull else { throw StackError.overflow }
-        top += 1
-        stackArray[top] = item
+        pointer += 1
+        store[pointer] = item
     }
 
-    mutating func pop() throws -> T {
+    mutating func pop() throws -> I {
         guard !isEmpty else { throw StackError.underflow }
         defer {
-            stackArray[top] = nil
-            top -= 1
+            store[pointer] = nil
+            pointer -= 1
         }
-        return try topItem
+        return try currentItem
     }
 
-    func peek() throws -> T {
+    func peek() throws -> I {
         guard !isEmpty else { throw StackError.underflow }
-        return try topItem
+        return try currentItem
     }
 }
-
-// TODO: DynamicArrayStack
-// TODO: LinkedListStack
-
-

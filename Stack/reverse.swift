@@ -16,6 +16,6 @@ func reverse<S: StackProtocol>(
 }
 
 var testString = "Hello, World!"
-var limitedArrayStack = LimitedArrayStack<Character>(maxSize: testString.count)
+var limitedArrayStack = LimitedArrayStack<Character>(limit: testString.count)
 
 try reverse(testString, using: &limitedArrayStack)
