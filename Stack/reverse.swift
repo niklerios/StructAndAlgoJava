@@ -1,17 +1,13 @@
-func doRev(input: String) -> String {
-    var theStack = StackX<Character>(maxSize: input.count)
+func reverse(_ input: String) throws -> String {
+    var stack = ArrayStack<Character>(maxSize: input.count)
     var output = ""
 
-    for ch in input {
-        try? theStack.push(ch)
+    for char in input {
+        try stack.push(char)
     }
 
-    while !theStack.isEmpty {
-        do {
-            output += String(try theStack.pop())
-        } catch {
-            break;
-        }
+    while !stack.isEmpty {
+        output += String(try stack.pop())
     }
 
     return output
