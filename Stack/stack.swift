@@ -21,8 +21,19 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     private var currentItem: I {
         get throws {
-            guard (0..<limit).contains(pointer), let item = store[pointer]
-            else { throw StackError.corruptedState }
+            guard
+                // В пределах индексов массива store
+                (0..<limit).contains(pointer),
+                // Элемент по указателю существует
+                let item = store[pointer]
+            else {
+                throw StackError.corruptedState
+            }
+            // Стэк не пустой
+            guard !isEmpty else {
+                throw StackError.underflow
+            }
+
             return item
         }
     }
@@ -32,27 +43,28 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     init(limit: Int) {
         precondition(limit > 0, "limit must be > 0")
+
         self.limit = limit
         store = [I?](repeating: nil, count: limit)
     }
 
     mutating func push(_ item: I) throws {
         guard !isFull else { throw StackError.overflow }
+
         pointer += 1
         store[pointer] = item
     }
 
     mutating func pop() throws -> I {
-        guard !isEmpty else { throw StackError.underflow }
         defer {
             store[pointer] = nil
             pointer -= 1
         }
+
         return try currentItem
     }
 
     func peek() throws -> I {
-        guard !isEmpty else { throw StackError.underflow }
-        return try currentItem
+        try currentItem
     }
 }
