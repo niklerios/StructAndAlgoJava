@@ -7,12 +7,8 @@ struct Stack<T> {
 
     private var topItem: T {
         get throws {
-            guard
-                (0..<maxSize).contains(top),
-                let item = stackArray[top]
-            else {
-                throw StackError.corruptedState
-            }
+            guard (0..<maxSize).contains(top), let item = stackArray[top]
+            else { throw StackError.corruptedState }
             return item
         }
     }
@@ -22,26 +18,22 @@ struct Stack<T> {
 
     init(maxSize: Int) {
         precondition(maxSize > 0, "maxSize must be > 0")
-
         self.maxSize = maxSize
         stackArray = [T?](repeating: nil, count: maxSize)
     }
 
     mutating func push(_ item: T) throws {
         guard !isFull else { throw StackError.overflow }
-
         top += 1
         stackArray[top] = item
     }
 
     mutating func pop() throws -> T {
         guard !isEmpty else { throw StackError.underflow }
-
         defer {
             stackArray[top] = nil
             top -= 1
         }
-
         return try topItem
     }
 
