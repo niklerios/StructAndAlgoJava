@@ -4,14 +4,17 @@ protocol StackProtocol {
     associatedtype Item
     
     var isEmpty: Bool { get }
-    var isFull: Bool { get }
     
     mutating func push(_ item: Item) throws -> Void
     mutating func pop() throws -> Item
     func peek() throws -> Item
 }
 
-struct ArrayStack<T>: StackProtocol {
+protocol LimitedStackProtocol: StackProtocol {
+    var isFull: Bool { get }
+}
+
+struct LimitedArrayStack<T>: LimitedStackProtocol {
     private let maxSize: Int
     private var stackArray: [T?]
     private var top = -1

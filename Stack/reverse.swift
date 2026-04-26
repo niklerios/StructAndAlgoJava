@@ -1,4 +1,7 @@
-func reverse<S: StackProtocol>(_ input: String, using stack: inout S) throws -> String where S.Item == Character {
+func reverse<S: StackProtocol>(
+    _ input: String,
+    using stack: inout S
+) throws -> String where S.Item == Character {
     var output = ""
 
     for char in input {
@@ -12,7 +15,7 @@ func reverse<S: StackProtocol>(_ input: String, using stack: inout S) throws -> 
     return output
 }
 
-var arrayStack = ArrayStack<Character>(maxSize: 10)
-let string = "abcd"
+var testString = "Hello, World!"
+var limitedArrayStack = LimitedArrayStack<Character>(maxSize: testString.count)
 
-try reverse(string, using: &arrayStack)
+try reverse(testString, using: &limitedArrayStack)
