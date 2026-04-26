@@ -29,13 +29,8 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
         }
     }
 
-    var isEmpty: Bool {
-        pointer == -1
-    }
-
-    var isFull: Bool {
-        pointer == limit - 1
-    }
+    var isEmpty: Bool { pointer == -1 }
+    var isFull: Bool { pointer == limit - 1 }
 
     init(limit: Int) {
         precondition(limit > 0, "limit must be > 0")
