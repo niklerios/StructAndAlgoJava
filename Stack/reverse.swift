@@ -1,5 +1,4 @@
-func reverse(_ input: String) throws -> String {
-    var stack = ArrayStack<Character>(maxSize: input.count)
+func reverse<S: StackProtocol>(_ input: String, using stack: inout S) throws -> String where S.Item == Character {
     var output = ""
 
     for char in input {
@@ -12,3 +11,8 @@ func reverse(_ input: String) throws -> String {
 
     return output
 }
+
+var arrayStack = ArrayStack<Character>(maxSize: 10)
+let string = "abcd"
+
+try reverse(string, using: &arrayStack)
