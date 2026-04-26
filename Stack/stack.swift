@@ -21,18 +21,9 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     private var currentItem: I {
         get throws {
-            guard
-                // В пределах индексов массива store
-                (0..<limit).contains(pointer),
-                // Элемент по указателю существует
-                let item = store[pointer]
-            else {
-                throw StackError.corruptedState
-            }
-            // Стэк не пустой
-            guard !isEmpty else {
-                throw StackError.underflow
-            }
+            guard (0..<limit).contains(pointer), let item = store[pointer]
+            else { throw StackError.corruptedState }
+            guard !isEmpty else { throw StackError.underflow }
 
             return item
         }
