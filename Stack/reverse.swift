@@ -17,5 +17,7 @@ func reverse<S: StackProtocol>(
 
 var testString = "Hello, World!"
 var limitedArrayStack = LimitedArrayStack<Character>(limit: testString.count)
+var dynamicArrayStack = DynamicArrayStack<Character>()
 
 try reverse(testString, using: &limitedArrayStack)
+try reverse(testString, using: &dynamicArrayStack)

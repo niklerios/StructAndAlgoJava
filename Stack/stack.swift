@@ -21,16 +21,27 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     private var currentItem: I {
         get throws {
-            guard (0..<limit).contains(pointer), let item = store[pointer]
-            else { throw StackError.corruptedState }
-            guard !isEmpty else { throw StackError.underflow }
+            guard !isEmpty else {
+                throw StackError.underflow
+            }
+            guard
+                (0..<limit).contains(pointer),
+                let item = store[pointer]
+            else {
+                throw StackError.corruptedState
+            }
 
             return item
         }
     }
 
-    var isEmpty: Bool { pointer == -1 }
-    var isFull: Bool { pointer == limit - 1 }
+    var isEmpty: Bool {
+        pointer == -1
+    }
+
+    var isFull: Bool {
+        pointer == limit - 1
+    }
 
     init(limit: Int) {
         precondition(limit > 0, "limit must be > 0")
@@ -40,7 +51,9 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
     }
 
     mutating func push(_ item: I) throws {
-        guard !isFull else { throw StackError.overflow }
+        guard !isFull else {
+            throw StackError.overflow
+        }
 
         pointer += 1
         store[pointer] = item
@@ -57,5 +70,42 @@ struct LimitedArrayStack<I>: LimitedStackProtocol {
 
     func peek() throws -> I {
         try currentItem
+    }
+}
+
+struct DynamicArrayStack<I>: StackProtocol {
+    private var store = [I]()
+    
+    var isEmpty: Bool {
+        store.isEmpty
+    }
+    
+    private var currentItem: I {
+        get throws {
+            guard !isEmpty else {
+                throw StackError.underflow
+            }
+            guard let item = store.last else {
+                throw StackError.corruptedState
+            }
+            
+            return item
+        }
+    }
+    
+    mutating func push(_ item: I) {
+        store.append(item)
+    }
+    
+    mutating func pop() throws -> I {
+        defer {
+            store.removeLast()
+        }
+
+        return try currentItem
+    }
+    
+    func peek() throws -> I {
+        return try currentItem
     }
 }
