@@ -1,89 +1,81 @@
-enum StackError: Error { case overflow, underflow, corruptedState }
-
 protocol StackProtocol {
     associatedtype Item
     
     var isEmpty: Bool { get }
-    
-    mutating func push(_ item: Item) throws -> Void
-    mutating func pop() throws -> Item
-    func peek() throws -> Item
-}
-
-protocol LimitedStackProtocol: StackProtocol {
     var isFull: Bool { get }
+    
+    mutating func push(_ item: Item) -> Bool
+    mutating func pop() -> Item?
+
+    func peek() -> Item?
 }
 
-struct LimitedArrayStack<I>: LimitedStackProtocol {
-    private let limit: Int
+struct PreallocatedStack<I>: StackProtocol {
     private var store: [I?]
     private var pointer = -1
-
-    private var currentItem: I {
-        get throws {
-            guard !isEmpty else { throw StackError.underflow }
-            guard (0..<limit).contains(pointer), let item = store[pointer]
-            else { throw StackError.corruptedState }
-
-            return item
-        }
+    
+    private var current: I? {
+        guard store.indices.contains(pointer), let item = store[pointer]
+        else { return nil }
+        
+        return item
     }
 
     var isEmpty: Bool { pointer == -1 }
-    var isFull: Bool { pointer == limit - 1 }
+    var isFull: Bool { pointer == store.count - 1 }
 
     init(limit: Int) {
-        precondition(limit > 0, "limit must be > 0")
-
-        self.limit = limit
         store = [I?](repeating: nil, count: limit)
     }
 
-    mutating func push(_ item: I) throws {
-        guard !isFull else { throw StackError.overflow }
+    mutating func push(_ item: I) -> Bool {
+        guard !isFull else { return false }
 
         pointer += 1
         store[pointer] = item
+
+        return true
     }
 
-    mutating func pop() throws -> I {
-        defer {
-            store[pointer] = nil
-            pointer -= 1
-        }
+    mutating func pop() -> I? {
+        guard let result = current else { return nil }
+        
+        store[pointer] = nil
+        pointer -= 1
 
-        return try currentItem
+        return result
     }
 
-    func peek() throws -> I {
-        try currentItem
-    }
+    func peek() -> I? { current }
 }
 
-struct DynamicArrayStack<I>: StackProtocol {
+struct DynamicStack<I>: StackProtocol {
     private var store = [I]()
+    private let limit: Int?
     
     var isEmpty: Bool { store.isEmpty }
+    var isFull: Bool { store.count == limit }
     
-    private var currentItem: I {
-        get throws {
-            guard !isEmpty else { throw StackError.underflow }
-            guard let item = store.last else { throw StackError.corruptedState }
-            
-            return item
-        }
+    private var current: I? {
+        store.last
     }
     
-    mutating func push(_ item: I) {
+    init(limit: Int? = nil) {
+        self.limit = limit
+    }
+    
+    mutating func push(_ item: I) -> Bool {
+        guard !isFull else { return false }
+
         store.append(item)
+        return true
     }
     
-    mutating func pop() throws -> I {
-        defer { store.removeLast() }
-        return try currentItem
+    mutating func pop() -> I? {
+        store.popLast()
     }
     
-    func peek() throws -> I {
-        return try currentItem
+    func peek() -> I? {
+        current
     }
 }
