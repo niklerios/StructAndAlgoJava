@@ -56,10 +56,6 @@ struct DynamicStack<I>: StackProtocol {
     var isEmpty: Bool { store.isEmpty }
     var isFull: Bool { store.count == limit }
     
-    private var current: I? {
-        store.last
-    }
-    
     init(limit: Int? = nil) {
         self.limit = limit
     }
@@ -76,6 +72,6 @@ struct DynamicStack<I>: StackProtocol {
     }
     
     func peek() -> I? {
-        current
+        store.last
     }
 }
