@@ -1,3 +1,5 @@
+enum StackError: Error { case overflow }
+
 protocol StackProtocol {
     associatedtype Item
     
@@ -5,6 +7,7 @@ protocol StackProtocol {
     var isFull: Bool { get }
     
     mutating func push(_ item: Item) -> Bool
+    mutating func pushOrThrow(_ item: Item) throws
     mutating func pop() -> Item?
 
     func peek() -> Item?
@@ -36,6 +39,10 @@ struct PreallocatedStack<I>: StackProtocol {
 
         return true
     }
+    
+    mutating func pushOrThrow(_ item: I) throws {
+        guard push(item) else { throw StackError.overflow }
+    }
 
     mutating func pop() -> I? {
         guard let result = current else { return nil }
@@ -46,7 +53,9 @@ struct PreallocatedStack<I>: StackProtocol {
         return result
     }
 
-    func peek() -> I? { current }
+    func peek() -> I? {
+        current
+    }
 }
 
 struct DynamicStack<I>: StackProtocol {
@@ -55,6 +64,10 @@ struct DynamicStack<I>: StackProtocol {
     
     var isEmpty: Bool { store.isEmpty }
     var isFull: Bool { store.count == limit }
+    
+    private var current: I? {
+        store.last
+    }
     
     init(limit: Int? = nil) {
         self.limit = limit
@@ -67,11 +80,15 @@ struct DynamicStack<I>: StackProtocol {
         return true
     }
     
+    mutating func pushOrThrow(_ item: I) throws {
+        guard push(item) else { throw StackError.overflow }
+    }
+    
     mutating func pop() -> I? {
         store.popLast()
     }
     
     func peek() -> I? {
-        store.last
+        current
     }
 }
